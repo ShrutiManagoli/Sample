@@ -1,24 +1,18 @@
 package runner;
 
 
-import io.cucumber.testng.AbstractTestNGCucumberTests;
-import io.cucumber.testng.CucumberOptions;
-import org.testng.annotations.DataProvider;
+import org.junit.platform.suite.api.ConfigurationParameter;
+import org.junit.platform.suite.api.IncludeEngines;
+import org.junit.platform.suite.api.SelectClasspathResource;
+import org.junit.platform.suite.api.Suite;
 
-@CucumberOptions(
-                    features ="src/test/resources/features",
-                    glue = {"org.example.stepDefs"},
-                    plugin ={"pretty", "html:target/cucumber-reports", "json:target/cucumber.json"},
-                    monochrome = true,
-                    publish = true
+import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
+import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
 
-)
-public class TestRunner extends AbstractTestNGCucumberTests {
-
-    @Override
-    @DataProvider(parallel = true)
-    public Object[][] scenarios()
-    {
-        return super.scenarios();
-    }
+@Suite
+@IncludeEngines("cucumber")
+@SelectClasspathResource("features")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "runner")
+public class TestRunner {
 }
