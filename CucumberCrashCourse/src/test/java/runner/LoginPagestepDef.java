@@ -1,4 +1,4 @@
-package org.example.stepDefs;
+package runner;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -7,7 +7,8 @@ import org.example.pages.LoginPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.Assert;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoginPagestepDef {
 
@@ -55,13 +56,13 @@ public class LoginPagestepDef {
 
     @Then("I should be logged in successfully")
     public void i_should_be_logged_in_successfully(){
-        Assert.assertEquals(loginPage.checkForgotPwdLink(),true);
+        assertTrue(loginPage.checkForgotPwdLink());
     }
 
     @Then("I should see an error message indicting {string}")
     public void i_should_see_an_error_message_indicating(String errorMessage)
     {
-        Assert.assertEquals(driver.findElement(By.cssSelector(".alrt-danger")).isDisplayed(),true);
+        assertTrue(driver.findElement(By.cssSelector(".alrt-danger")).isDisplayed());
     }
 
     @When("I click on the \"Forgotten Password\" link")
@@ -71,6 +72,6 @@ public class LoginPagestepDef {
 
     @Then("I should be redirected to the password reset page")
     public void i_should_be_redirected_to_the_password_reset_page(){
-        Assert.assertTrue(loginPage.getForgotPwdUrl().contains("account/forgotten"));
+        assert(loginPage.getForgotPwdUrl().contains("account/forgotten"));
     }
 }

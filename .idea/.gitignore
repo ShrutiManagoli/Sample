@@ -1,0 +1,21 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+Maven*
+/.idea/*
+/aws.xml
+/codeStyles/codeStyleConfig.xml
+/compiler.xml
+/dbnavigator.xml
+/dictionaries
+/encodings.xml
+/sonarlint/issuestore/index.pb
+/jarRepositories.xml
+/misc.xml
+/modules.xml
+/codeStyles/Project.xml
+/inspectionProfiles/Project_Default.xml
+/Sample.iml
+/sbt.xml
+/uiDesigner.xml
+/vcs.xml
