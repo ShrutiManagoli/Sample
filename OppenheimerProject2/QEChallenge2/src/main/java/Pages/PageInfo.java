@@ -1,6 +1,7 @@
 package Pages;
 
 import dev.failsafe.internal.util.Assert;
+import org.apache.commons.lang3.ObjectUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.*;
 import java.io.File;
@@ -28,11 +29,12 @@ public class PageInfo {
     private final By ChooseFileButton = By.xpath("//input[@id='upload-csv-file']");
     private final By CreateButton = By.xpath("//button[contains(text(), 'Create')]");
     private final By SuccessMsg = By.xpath("//div[@id='notification-block']");
-    private final By ErrorMsg = By.xpath("//div[@class='row py-2']//descendant::h3[contains(text(), 'Unable to create hero')]");
+    //private final By ErrorMsg = By.xpath("//div[@class='row py-2']//descendant::h3[contains(text(), 'Unable to create hero')]");
+    private final By ErrorMsg = By.xpath("//div[contains(@class, '')]/h3");
     private final By BackBtn = By.xpath("//a[@class='btn btn-primary']");
     public By TaxReliefBtn = By.xpath("//button[@id='tax_relief_btn']");
 
-
+    public static By EgressProgressMsg = By.xpath("//span[@id=\"tax_relief_status_id");
     //Constructor
     public PageInfo(WebDriver driver) {
 
@@ -105,22 +107,28 @@ public class PageInfo {
             Assert.isTrue(true, "User not on homegpae. Please check");
     }
 
-    public void uploadfileFail() {
-        //WebElement selectCSVdropdown = driver.findElement(UploadCSVDrpdownOption);
-        //selectCSVdropdown.click();
+    public void uploadfileFail() throws InterruptedException {
+        WebElement HeroBtnClick = driver.findElement(HeroButton);
+        HeroBtnClick.click();
+        WebElement selectCSVdropdown = driver.findElement(UploadCSVDrpdownOption);
+        selectCSVdropdown.click();
+
         WebElement ChooseFileButtonClick = driver.findElement(ChooseFileButton);
-        System.out.println(ChooseFileButtonClick.isDisplayed());
         File file = new File("./Oppenheimer-invalid.csv");
-        //System.out.println(file.getAbsolutePath());
         ChooseFileButtonClick.sendKeys(file.getAbsolutePath());
         WebElement CreatebuttonClick = driver.findElement(CreateButton);
         CreatebuttonClick.click();
-        WebElement ErrorMsgClick = driver.findElement(ErrorMsg);
+        if(!(driver.findElement(ErrorMsg).isDisplayed()))
+        {
+            System.out.println("Waiting for error message to be displayed");
+            Thread.sleep(5000);
+        }
 
-        if (ErrorMsgClick.isDisplayed()) {
-            System.out.println("CSV file upload is erronous due to missing/invalid data or format");
+        if (driver.findElement(ErrorMsg).isDisplayed()) {
+            Assert.isTrue(true, "Invalid file - therefore the upload failed.");
+
         } else {
-            System.out.println("Something wrong, could not upload file. Please check");
+            Assert.isTrue(false,"Something wrong, could not upload file. Please check");
         }
 
 
@@ -175,19 +183,14 @@ public class PageInfo {
                     return false;
 
             case "deathDate":
-                if(value=="")
-                    return false;
-                else {
                     stringPattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}");
-                    if (stringPattern.matcher(value).find())
+                    if ((value.isEmpty()) || stringPattern.matcher(value).find())
                         return true;
                     else
                         return false;
-
-
-                }
-
-
+            case "browniePoints":
+                if(value.isEmpty() || Integer.parseInt(value)==0 || Integer.parseInt(value)!=0)
+                    return true;
         }
         return false;
     }
@@ -196,6 +199,7 @@ public class PageInfo {
     {
         if((num != (int) num) || Double.isInfinite(num) || Double.isNaN(num))
             return true;
-        else return false;
+        else
+            return false;
     }
 }

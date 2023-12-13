@@ -2,6 +2,7 @@ package stepdefs;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 
@@ -11,19 +12,26 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasValue;
 
-public class apirequets {
+public class apiRequest {
     @Test
     public void PostVoucherSuccess()
     {
         File payload= new File("Payload.rtf");
+        int count = ClerkLoginStepDef.CountRows("vouchers");
         Response response = given().
         contentType(ContentType.JSON).
                 body(payload).
                 when().
                 post("http://localhost:9997/api/v1/hero/vouchers");
-        if(response.statusCode()==200)
-            System.out.println("Record successfully inserted");
+        if(response.statusCode()==200) {
+            int aftercount = ClerkLoginStepDef.CountRows("vouchers");
+            if(aftercount>count) {
+                Assert.assertTrue(true);
+                System.out.println("Record successfully inserted");
+            }
+        }
         else
+            Assert.assertTrue(false);
             System.out.println("Insert with new natid");
     }
 
@@ -31,6 +39,7 @@ public class apirequets {
     public void PostVoucherFail()
     {
         File payload= new File("Payload.rtf");
+        int count = ClerkLoginStepDef.CountRows("vouchers");
         Response response = given().
                 contentType(ContentType.JSON).
                 body(payload).
@@ -38,8 +47,16 @@ public class apirequets {
                 post("http://localhost:9997/api/v1/hero/vouchers");
         if(response.statusCode()==400) {
             System.out.println("Voucher Name cannot be blank");
+            int aftercount = ClerkLoginStepDef.CountRows("vouchers");
+            if(aftercount==count)
+            {
+                System.out.println("Record not inserted in db when voucher ID is null");
+                Assert.assertTrue(true);
+            }
+
         }
         else
+            Assert.assertTrue(false);
             System.out.println("Insert with new natid");
     }
 

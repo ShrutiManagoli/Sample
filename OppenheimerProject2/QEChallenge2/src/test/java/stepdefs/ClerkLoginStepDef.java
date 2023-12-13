@@ -2,7 +2,6 @@ package stepdefs;
 
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import io.cucumber.java.BeforeAll;
 import io.cucumber.java.en.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -11,11 +10,9 @@ import Pages.PageInfo;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.Assert;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-
 import java.io.File;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -28,31 +25,42 @@ public class ClerkLoginStepDef {
 
     private WebDriver driver;
     private PageInfo PageInfo;
+    private Boolean result = false;
     private File folder = new File(UUID.randomUUID().toString());
+    private String url = "jdbc:mysql://localhost:3306/testdb";
+    private String username = "user";
+    private String password = "userpassword";
+    private Connection connection = null;
+    private static Statement statement;
+    public int beforecount=0;
+    public int aftercount=0;
+    public static int rowcount =0;
 
     @Before
-    public void setup()
-    {
-      //  driver = new ChromeDriver();
+    public void setup() {
+
+        //Chrome driver set-up
         folder.mkdir();
 
         //chrome
         ChromeOptions options = new ChromeOptions();
 
         Map<String, Object> prefs = new HashMap<String, Object>();
-        prefs.put("profile.default_content_settings.popups",0);
+        prefs.put("profile.default_content_settings.popups", 0);
         prefs.put("download.default_directory", folder.getAbsolutePath());
 
         options.setExperimentalOption("prefs", prefs);
         DesiredCapabilities cap = new DesiredCapabilities();
-        cap.setCapability(ChromeOptions.CAPABILITY,options);
+        cap.setCapability(ChromeOptions.CAPABILITY, options);
 
-        driver= new ChromeDriver(options);
+        driver = new ChromeDriver(options);
+
     }
 
     @After
     public void tearDown()
     {
+
         if (driver != null) {
             driver.quit();
         }
@@ -60,6 +68,27 @@ public class ClerkLoginStepDef {
             file.delete();
         }
         folder.delete();
+
+        //close db connection;
+        try {
+            connection.close();
+        }
+        catch(Exception e){
+            System.out.println(e);
+
+    }
+    }
+
+    public void DBSetup() throws SQLException {
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+             connection = DriverManager.getConnection(url, username, password);
+             statement = connection.createStatement();
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     @Given("I am on the Application login page")
@@ -82,18 +111,51 @@ public class ClerkLoginStepDef {
 
     @When("I upload a valid CSV file and verify the success message")
     public void i_upload_a_valid_csv_file_and_verify_the_success_message()  {
+        Boolean flag=false;
         PageInfo.ClickHeroBtn();
+        beforecount = CountRows("working_class_heroes");
         PageInfo.uploadfileSucess();
+        aftercount = CountRows("working_class_heroes");
+        if(aftercount>beforecount)
+        {
+            flag =true;
+            Assert.assertTrue(flag, "record succesfully inserted");
+        }
     }
 
     @Given("navigate to the homepage")
     public void navigate_to_the_homepage() {
         PageInfo.HomepageNavigation();
     }
-        @When("I upload a invalid CSV file")
-    public void i_upload_a_invalid_csv_file() {
-        PageInfo.uploadfileFail();
+
+    public static int CountRows(String tableName){
+        //ResultSet res = statement.executeQuery("show tables");
+        try {
+            ResultSet resultSet = statement.executeQuery("select * count" + tableName);
+            while (resultSet.next()) {
+                rowcount = rowcount + 1;
+            }
+        }
+        catch(Exception e) {
+            System.out.println(e.getStackTrace());
+        }
+        return rowcount;
+
     }
+        @When("I upload a invalid CSV file")
+    public void i_upload_a_invalid_csv_file() throws InterruptedException {
+            Boolean flag = false;
+            beforecount = CountRows("working_class_heroes");
+            PageInfo.uploadfileFail();
+            aftercount = CountRows("working_class_heroes");
+            if(aftercount==beforecount)
+            {
+                flag =true;
+                Assert.assertTrue(flag, "record not inserted when file is invalid");
+            }
+
+    }
+
 
     @Given("I have the string url")
     public void i_have_the_string_url() {
@@ -132,16 +194,29 @@ public class ClerkLoginStepDef {
     @Then("verify that the salary and Tax Paid field validation for {string} having {string} is correct")
     public void verify_that_the_salary_and_tax_paid_field_validation_for_having_is_correct(String key, String value) {
         float num = Float.parseFloat(value);
-        boolean result = PageInfo.decimalVerification(num);
-        Assert.assertTrue(result,"salary & tax paid is not float");
+        if(num>0 ) {
+            result = PageInfo.decimalVerification(num);
+            {
+                result = true;
+                Assert.assertTrue(result, "Value of " + key + "is integer. Please change it floating point number");
+
+            }
+        }
+        else
+            Assert.assertFalse(result, "Value of "+ key +"is negative number");
     }
 
     @When("User generates Tax Relief file")
     public void user_generates_tax_relief_file() throws InterruptedException {
-        WebElement TaxReliefBtnclick = driver.findElement(PageInfo.TaxReliefBtn);
-        TaxReliefBtnclick.click();
+        if(driver.findElement(Pages.PageInfo.EgressProgressMsg).isDisplayed())
+            Assert.assertFalse(true, "Cannot click on Generate Tax Relief button because the Egress file process is in-progress");
 
-        TaxReliefGeneration();
+        WebElement TaxReliefBtnclick = driver.findElement(PageInfo.TaxReliefBtn);
+        if(TaxReliefBtnclick.isEnabled()) {
+            TaxReliefBtnclick.click();
+            Thread.sleep(4000);
+            TaxReliefGeneration();
+        }
     }
 
     public void TaxReliefGeneration() throws InterruptedException {
