@@ -12,6 +12,12 @@ The automation test design is based on the Cucumber BDD using the below plugins:
 IDE Used: IntelliJ
 The dependencies are present in the pom.xml
 
+Pre-Requisites to run the test:
+1. Java 17 jars which are needed to for the application under test.
+2. Maven for dependency management & test run
+3. My SQL running on docker
+4. Java 8 application jar
+
 To run the cases on the IDE use
 1. Create a pull request/clone or download the QEChallenge2 folder
 2. Increment the natid number in the Oppenheimer-Sheet1.csv file
