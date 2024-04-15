@@ -1,0 +1,15 @@
+
+m	java:S117P"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ü¦ªç8­óÙ‚î1
+
+java:S14882"bImmediately return this expression instead of assigning it to the temporary variable "actualItem".(à·áÊ8¯óÙ‚î1
+
+java:S1488Y"]Immediately return this expression instead of assigning it to the temporary variable "count".(æÌÆ×ùÿÿÿÿ8¯óÙ‚î1
+i	java:S101	"MRename this class name to match the regular expression '^[A-Z][a-zA-Z0-9]*$'.(ÊÍí‡8°óÙ‚î1
+c
+java:S1126)"AReplace this if-then-else statement by a single return statement.(îÖ‡‘øÿÿÿÿ8ÅóÙ‚î1
+]	java:S125'"<This block of commented-out lines of code should be removed.(ÛêöØşÿÿÿÿ8ÅóÙ‚î1
+o	java:S100N"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜¬ÿÚøÿÿÿÿ8ÈóÙ‚î1
+G
+java:S1197X"*Move the array designators [] to the type.(’š²8ÊóÙ‚î1
+[
+java:S1117Y"9Rename "count" which hides the field declared at line 21.(æÌÆ×ùÿÿÿÿ8ËóÙ‚î1

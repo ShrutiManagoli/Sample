@@ -70,13 +70,13 @@ public class ClerkLoginStepDef {
         folder.delete();
 
         //close db connection;
-        try {
-            connection.close();
-        }
-        catch(Exception e){
-            System.out.println(e);
+       // try {
+         //   connection.close();
+       // }
+       // catch(Exception e){
+      //      System.out.println(e);
 
-    }
+    //}
     }
 
     public void DBSetup() throws SQLException {
